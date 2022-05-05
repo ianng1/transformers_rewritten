@@ -439,6 +439,8 @@ def main():
         result["labels"] = result["input_ids"].copy()
         print("--------RESULT---------------")
         print(result)
+        print(len(result['input_ids']))
+        print(total_length//block_size)
         print(result.keys())
         input()
         return result
