@@ -425,6 +425,7 @@ def main():
     def group_texts(examples):
         # Concatenate all texts.
         concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
+        print(len(concatenated_examples.keys()))
         total_length = len(concatenated_examples[list(examples.keys())[0]])
         # We drop the small remainder, we could add padding if the model supported it instead of this drop, you can
         # customize this part to your needs.
@@ -438,6 +439,7 @@ def main():
         result["labels"] = result["input_ids"].copy()
         print("--------RESULT---------------")
         print(result)
+        print(result.keys())
         input()
         return result
 
