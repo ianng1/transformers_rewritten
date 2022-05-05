@@ -378,7 +378,6 @@ def main():
     if training_args.do_train:
         column_names = raw_datasets["train"].column_names
         print(column_names)
-        input()
     else:
         column_names = raw_datasets["validation"].column_names
     text_column_name = "text" if "text" in column_names else column_names[0]
@@ -437,6 +436,9 @@ def main():
             for k, t in concatenated_examples.items()
         }
         result["labels"] = result["input_ids"].copy()
+        print("--------RESULT---------------")
+        print(result)
+        input()
         return result
 
     # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
