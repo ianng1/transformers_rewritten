@@ -377,6 +377,8 @@ def main():
     # First we tokenize all the texts.
     if training_args.do_train:
         column_names = raw_datasets["train"].column_names
+        print(column_names)
+        input()
     else:
         column_names = raw_datasets["validation"].column_names
     text_column_name = "text" if "text" in column_names else column_names[0]
