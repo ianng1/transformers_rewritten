@@ -1128,6 +1128,12 @@ class Trainer:
 
         return model
 
+
+    def train(self):
+        print(self.train_dataset)
+        print(self.eval_dataset)
+        input()
+    """
     def train(
         self,
         resume_from_checkpoint: Optional[Union[str, bool]] = None,
@@ -1135,6 +1141,7 @@ class Trainer:
         ignore_keys_for_eval: Optional[List[str]] = None,
         **kwargs,
     ):
+    """
         """
         Main training entry point.
 
@@ -1151,6 +1158,9 @@ class Trainer:
             kwargs:
                 Additional keyword arguments used to hide deprecated arguments
         """
+
+    """
+
         if resume_from_checkpoint is False:
             resume_from_checkpoint = None
 
@@ -1562,6 +1572,8 @@ class Trainer:
         self.control = self.callback_handler.on_train_end(args, self.state, self.control)
 
         return TrainOutput(self.state.global_step, train_loss, metrics)
+    """
+
 
     def _load_from_checkpoint(self, resume_from_checkpoint):
         if not os.path.isfile(os.path.join(resume_from_checkpoint, WEIGHTS_NAME)) and not os.path.isfile(
