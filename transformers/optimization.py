@@ -382,7 +382,10 @@ class AdamW(Optimizer):
 
         return loss
         """
-        print("Running ADAM optimizer")
+        loss = None
+        if closure is not None:
+            loss = closure()
+        print("\nRunning ADAM optimizer")
         for group in self.param_groups:
             for p in group['params']:
                 state = self.state['p']
@@ -407,6 +410,8 @@ class AdamW(Optimizer):
                 state['v'] = v
                 state['timestep'] += 1
                 p.data += correction
+                if group["weight_decay"] > 0.0:
+                    p.data.add_(p.data, alpha=(-group["lr"] * group["weight_decay"]))
         return loss
 
 
