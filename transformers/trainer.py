@@ -2046,6 +2046,7 @@ class Trainer:
         Return:
             `torch.Tensor`: The tensor with training loss on this batch.
         """
+       
         model.train()
         inputs = self._prepare_inputs(inputs)
 
@@ -2076,6 +2077,14 @@ class Trainer:
             loss.backward()
 
         return loss.detach()
+        """
+
+        #Put model into training mode
+        model.train()
+        inputs = self._prepare_inputs(inputs)
+        """
+
+
 
     def compute_loss(self, model, inputs, return_outputs=False):
         """

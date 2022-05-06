@@ -452,6 +452,7 @@ class LabelSmoother:
     ignore_index: int = -100
 
     def __call__(self, model_output, labels):
+        """
         logits = model_output["logits"] if isinstance(model_output, dict) else model_output[0]
         log_probs = -nn.functional.log_softmax(logits, dim=-1)
         if labels.dim() == log_probs.dim() - 1:
@@ -473,6 +474,13 @@ class LabelSmoother:
         nll_loss = nll_loss.sum() / num_active_elements
         smoothed_loss = smoothed_loss.sum() / (num_active_elements * log_probs.shape[-1])
         return (1 - self.epsilon) * nll_loss + self.epsilon * smoothed_loss
+        """
+        print("\nHIT LABEL SMOOTHER")
+
+        print(model_output)
+        print(model_output.shape)
+        input()
+
 
 
 def get_length_grouped_indices(lengths, batch_size, mega_batch_mult=None, generator=None):
