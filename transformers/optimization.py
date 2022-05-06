@@ -399,7 +399,7 @@ class AdamW(Optimizer):
                 v = state['v']
                 t = state['timestep']
                 beta1, beta2 = group["betas"]
-                m = beta1 * m + (1 - beta1)*gradient
+                m.mul_(beta1).add_(gradient, 1 - beta1)
                 mt = m/(1 - beta1**t)
                 v = beta2*v + (1 - beta2)*torch.square(gradient)
                 vt = v / (1 - beta2**t)
