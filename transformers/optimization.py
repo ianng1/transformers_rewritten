@@ -327,6 +327,7 @@ class AdamW(Optimizer):
         Arguments:
             closure (`Callable`, *optional*): A closure that reevaluates the model and returns the loss.
         """
+        """
         loss = None
         if closure is not None:
             loss = closure()
@@ -380,6 +381,38 @@ class AdamW(Optimizer):
                     p.data.add_(p.data, alpha=(-group["lr"] * group["weight_decay"]))
 
         return loss
+        """
+        print("Running ADAM optimizer")
+        for group in self.param_groups:
+            for p in group['params']:
+                state = self.state['p']
+                gradient = p.grad.data
+                if (len(self.state['p'].keys()) == 0):
+                    state['timestep'] = 1
+                    state['m'] = torch.zeros(p.data.shape)
+                    state['v'] = torch.zeros(p.data.shape)
+
+                m = state['m']  
+                v = state['v']
+                t = state['timestep']
+                beta1, beta2 = group["betas"]
+                m = beta1 * m + (1 - beta1)*gradient
+                mt = m/(1 - beta1**t)
+                v = beta2*v + (1 - beta2)*torch.square(gradient)
+                vt = v / (1 - beta2**t)
+                vt = torch.sqrt(vt) + group['eps']
+                
+                correction = -group['lr'] * torch.div(mt, vt)
+                state['m'] = m
+                state['v'] = v
+                state['timestep'] += 1
+                p.data += correction
+        return loss
+
+
+                
+
+
 
 
 class Adafactor(Optimizer):
