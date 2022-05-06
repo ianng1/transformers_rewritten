@@ -2096,7 +2096,14 @@ class Trainer:
             labels = inputs.pop("labels")
         else:
             labels = None
+        
+        #input has input_ids, attention_mask, and labels
         outputs = model(**inputs)
+
+
+        #outputs = 'transformers.modeling_outputs.CausalLMOutputWithCrossAttentions'
+        #has logits tensor and loss value
+
         # Save past state if it exists
         # TODO: this needs to be fixed and made cleaner later.
         if self.args.past_index >= 0:
@@ -2719,7 +2726,7 @@ class Trainer:
         """
         
 
-        """
+        
         has_labels = all(inputs.get(k) is not None for k in self.label_names)
         inputs = self._prepare_inputs(inputs)
         if ignore_keys is None:
@@ -2786,13 +2793,7 @@ class Trainer:
             logits = logits[0]
 
         return (loss, logits, labels)
-        """
-        with torch.no_grad():
-            loss, output = self.compute_loss(model, inputs, return_outputs=True)
-            loss = loss.mean()
-            print(type(output))
-            print(output)
-            input()
+
 
 
 
