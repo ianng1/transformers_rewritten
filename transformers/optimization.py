@@ -327,6 +327,7 @@ class AdamW(Optimizer):
         Arguments:
             closure (`Callable`, *optional*): A closure that reevaluates the model and returns the loss.
         """
+        """
         loss = None
         if closure is not None:
             loss = closure()
@@ -409,11 +410,8 @@ class AdamW(Optimizer):
                 state['v'] = v
                 state['timestep'] += 1
                 p.data += correction
-                if group["weight_decay"] > 0.0:
-                    p.data.add_(p.data, alpha=(-group["lr"] * group["weight_decay"]))
+                
         return loss
-                """
-
 
 
                 
