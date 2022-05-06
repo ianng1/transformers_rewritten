@@ -437,12 +437,6 @@ def main():
             for k, t in concatenated_examples.items()
         }
         result["labels"] = result["input_ids"].copy()
-        print("--------RESULT---------------")
-        print(result)
-        print(len(result['input_ids']))
-        print(total_length//block_size)
-        print(result.keys())
-        input()
         return result
 
     # Note that with `batched=True`, this map processes 1,000 texts together, so group_texts throws away a remainder
