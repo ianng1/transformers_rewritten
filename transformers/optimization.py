@@ -63,13 +63,16 @@ def get_constant_schedule_with_warmup(optimizer: Optimizer, num_warmup_steps: in
     Return:
         `torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
     """
-
+    """
     def lr_lambda(current_step: int):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1.0, num_warmup_steps))
         return 1.0
-
-    return LambdaLR(optimizer, lr_lambda, last_epoch=last_epoch)
+    """
+    def determine_multiplier(step):
+        # Returns 1 if step >= num_warmup_steps and the fraction otherwise
+        return min(1, step/num_warmup_steps)
+    return LambdaLR(optimizer, determine_multiplier, last_epoch=last_epoch)
 
 
 def get_linear_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps, last_epoch=-1):
@@ -90,15 +93,22 @@ def get_linear_schedule_with_warmup(optimizer, num_warmup_steps, num_training_st
     Return:
         `torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
     """
-
+    """
     def lr_lambda(current_step: int):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
         return max(
             0.0, float(num_training_steps - current_step) / float(max(1, num_training_steps - num_warmup_steps))
         )
+    """
 
-    return LambdaLR(optimizer, lr_lambda, last_epoch)
+    def determine_multiplier(step):
+        if (step <= num_warmup_steps):
+            return step/max(1, num_warmup_steps)
+        else:
+            return 1 - (step - num_warmup_steps)/(num_training_steps - num_warmup_steps)
+
+    return LambdaLR(optimizer, determine_multiplier, last_epoch)
 
 
 def get_cosine_schedule_with_warmup(
@@ -125,14 +135,20 @@ def get_cosine_schedule_with_warmup(
     Return:
         `torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
     """
-
+    """
     def lr_lambda(current_step):
         if current_step < num_warmup_steps:
             return float(current_step) / float(max(1, num_warmup_steps))
         progress = float(current_step - num_warmup_steps) / float(max(1, num_training_steps - num_warmup_steps))
         return max(0.0, 0.5 * (1.0 + math.cos(math.pi * float(num_cycles) * 2.0 * progress)))
+    """
+    def determine_multiplier(step):
+        if (step <= num_warmup_steps):
+            return step/max(1, num_warmup_steps)
+        else:
+            return 0.5 * (1 + math.cos((step - num_warmup_steps)/(num_training_steps - num_warmup_steps) * num_cycles * 2)) 
 
-    return LambdaLR(optimizer, lr_lambda, last_epoch)
+    return LambdaLR(optimizer, determine_multiplier, last_epoch)
 
 
 def get_cosine_with_hard_restarts_schedule_with_warmup(
@@ -140,7 +156,7 @@ def get_cosine_with_hard_restarts_schedule_with_warmup(
 ):
     """
     Create a schedule with a learning rate that decreases following the values of the cosine function between the
-    initial lr set in the optimizer to 0, with several hard restarts, after a warmup period during which it increases
+    initial lr set in the optimizer txo 0, with several hard restarts, after a warmup period during which it increases
     linearly between 0 and the initial lr set in the optimizer.
 
     Args:
@@ -382,10 +398,10 @@ class AdamW(Optimizer):
 
         return loss
         """
+        device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         loss = None
         if closure is not None:
             loss = closure()
-        print("\nRunning ADAM optimizer")
         for group in self.param_groups:
             for p in group['params']:
                 if p.grad is None:
@@ -396,8 +412,8 @@ class AdamW(Optimizer):
                 state = self.state['p']
                 if (len(self.state['p'].keys()) == 0):
                     state['timestep'] = 1
-                    state['m'] = torch.zeros(p.data.shape)
-                    state['v'] = torch.zeros(p.data.shape)
+                    state['m'] = torch.zeros(p.data.shape, device=p.data.get_device())
+                    state['v'] = torch.zeros(p.data.shape, device=p.data.get_device())
 
                 m = state['m']  
                 v = state['v']
@@ -413,8 +429,7 @@ class AdamW(Optimizer):
                 state['m'] = m
                 state['v'] = v
                 state['timestep'] += 1
-                p.data += correction
-                
+                p.data += correction                
         return loss
 
 
