@@ -1129,10 +1129,23 @@ class Trainer:
         return model
 
 
-    def train(self):
+    def train(self, model):
+        #type Dataset
         print(self.train_dataset)
         print(self.eval_dataset)
-        input()
+        train_dataloader = self.get_train_dataloader()
+        
+        model = self._wrap_model(self.model)
+        for epoch in range(self.args.num_train_epochs):
+          print("Epoch:", epoch)
+          for step, inputs in enumerate(train_dataloader):
+              
+              loss = self.training_step(model, inputs)
+              print("Iteration", step, "Loss:", loss)
+              self.optimizer.zero_grad()
+              loss.backward()
+              self.optimizer.step()
+
     """
     def train(
         self,
@@ -1142,7 +1155,7 @@ class Trainer:
         **kwargs,
     ):
     """
-        """
+    """
         Main training entry point.
 
         Args:
