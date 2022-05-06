@@ -2506,6 +2506,7 @@ class Trainer:
         # Main evaluation loop
         for step, inputs in enumerate(dataloader):
             # Update the observed num examples
+
             observed_batch_size = find_batch_size(inputs)
             if observed_batch_size is not None:
                 observed_num_examples += observed_batch_size
@@ -2716,6 +2717,9 @@ class Trainer:
             Tuple[Optional[torch.Tensor], Optional[torch.Tensor], Optional[torch.Tensor]]: A tuple with the loss,
             logits and labels (each being optional).
         """
+        
+
+        """
         has_labels = all(inputs.get(k) is not None for k in self.label_names)
         inputs = self._prepare_inputs(inputs)
         if ignore_keys is None:
@@ -2782,6 +2786,18 @@ class Trainer:
             logits = logits[0]
 
         return (loss, logits, labels)
+        """
+        with torch.no_grad():
+            loss, output = self.compute_loss(model, inputs, return_outputs=True)
+            loss = loss.mean()
+            print(type(output))
+            print(output)
+            input()
+
+
+
+
+
 
     def floating_point_ops(self, inputs: Dict[str, Union[torch.Tensor, Any]]):
         """
